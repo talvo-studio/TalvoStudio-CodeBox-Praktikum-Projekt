@@ -44,7 +44,18 @@ statisch gebunden sein:
 g++ -std=c++17 -Wall -Wextra -O2 -static src/main.cpp -o codebox.exe
 ```
 
-Oder `make windows`.
+Oder `make windows`. Oder, wenn beim Abtippen etwas klemmt:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ..\scripts\build-windows.ps1
+```
+
+Das Skript sucht den Compiler, übersetzt mit den richtigen Schaltern und
+zeigt die Fehlerausgabe vollständig an. Zwei Fallen fallen damit weg: Beim
+Kopieren aus einer Nachricht werden Bindestriche manchmal zu langen Strichen
+(`–std` statt `-std`) — der Compiler bricht dann mit Rückgabewert 1 ab. Und
+was ein natives Programm nach stderr schreibt, zeigt PowerShell nicht immer
+an, sodass der Abbruch ohne jede Meldung dasteht.
 
 Der Grund für `-static`: Ohne den Schalter sucht das fertige Programm beim
 Start `libstdc++-6.dll` und `libgcc_s_seh-1.dll`. Die liegen in
