@@ -1,0 +1,17 @@
+{
+  "name": "codebox-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CodeBox — Quelltext ablegen und über einen kurzen Code teilen.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:local": "wrangler d1 execute codebox --local --file=./schema.sql",
+    "db:remote": "wrangler d1 execute codebox --remote --file=./schema.sql",
+    "demo:local": "wrangler d1 execute codebox --local --file=./demo.sql",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^3.99.0"
+  }
+}

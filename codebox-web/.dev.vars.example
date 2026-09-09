@@ -1,0 +1,4 @@
+# Vorlage für die lokale Entwicklung. Kopie als .dev.vars anlegen.
+# Im Netz wird derselbe Wert stattdessen als Secret gesetzt:
+#   npx wrangler secret put INVITE_CODE
+INVITE_CODE=bfia25

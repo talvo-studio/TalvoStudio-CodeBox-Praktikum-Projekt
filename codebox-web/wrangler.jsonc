@@ -1,0 +1,17 @@
+{
+  // Konfiguration des Workers. Wer das Projekt zum ersten Mal veröffentlicht,
+  // legt mit "npx wrangler d1 create codebox" eine eigene Datenbank an und
+  // trägt die ausgegebene ID unten ein. Lokal (npx wrangler dev) wird die ID
+  // nicht gebraucht — dort liegt die Datenbank als Datei unter .wrangler/.
+  "name": "codebox",
+  "main": "src/index.js",
+  "compatibility_date": "2025-01-01",
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "codebox",
+      "database_id": "hier-die-eigene-id-eintragen"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+node_modules
+.wrangler
+
+# Der Einladungscode für die lokale Entwicklung. Gehört nie ins Repository.
+.dev.vars
