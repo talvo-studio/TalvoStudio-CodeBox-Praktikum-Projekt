@@ -162,6 +162,24 @@ PATH und nicht im aktuellen Ordner.
 Das Programm wurde ohne `-static` übersetzt. Noch einmal mit dem Schalter
 übersetzen — siehe oben.
 
+**Das Übersetzen bricht wortlos ab, Rückgabewert 1 (Windows)**
+`g++ --version` funktioniert, aber jeder echte Übersetzungsversuch endet ohne
+eine einzige Zeile. Dann fehlt der bin-Ordner des Compilers im PATH:
+
+```powershell
+$env:Path = "C:\msys64\ucrt64\bin;" + $env:Path
+```
+
+Der Grund ist unauffällig. `g++.exe` ist nur der Anrufer; die eigentliche
+Arbeit macht `cc1plus.exe`, die tief unter `lib\gcc\...` liegt. Ihre DLLs
+liegen aber in `ucrt64\bin`. Windows sucht DLLs im Ordner der laufenden
+Datei — und das ist der von `cc1plus`, nicht der von `g++`. Also findet
+`cc1plus` seine DLLs nicht, stirbt sofort und schafft es nicht einmal mehr,
+eine Fehlermeldung auszugeben.
+
+Im Fenster **MSYS2 UCRT64** aus dem Startmenü tritt das nie auf, weil der
+Ordner dort schon im PATH steht. `build-windows.ps1` ergänzt ihn selbst.
+
 **„Nicht angemeldet"**
 `codebox login` ausführen.
 

@@ -75,6 +75,25 @@ if ($LASTEXITCODE -ne 0) {
 }
 Gut "Version:  $version"
 
+# Der Ordner des Compilers muss in den PATH, sonst scheitert das Uebersetzen
+# wortlos.
+#
+# g++.exe ist nur der Anrufer. Die eigentliche Arbeit macht cc1plus.exe, und
+# die liegt tief unter lib\gcc\... . Ihre DLLs (libisl, libmpc, libmpfr,
+# libgmp, libwinpthread) liegen aber hier in bin\. Windows sucht DLLs im
+# Ordner der laufenden Datei -- und das ist der von cc1plus, nicht der von
+# g++. Startet man g++ aus PowerShell heraus mit vollem Pfad, findet cc1plus
+# seine DLLs also nicht, stirbt sofort und schafft es nicht einmal mehr, eine
+# Meldung auszugeben. Uebrig bleibt Rueckgabewert 1 ohne ein Wort.
+#
+# Im Fenster "MSYS2 UCRT64" faellt das nicht auf: Dort steht der Ordner schon
+# im PATH.
+$gppOrdner = Split-Path $gpp -Parent
+if (($env:Path -split ";") -notcontains $gppOrdner) {
+    $env:Path = $gppOrdner + ";" + $env:Path
+    Info "PATH ergaenzt um $gppOrdner"
+}
+
 # --- Uebersetzen ---
 
 Push-Location $cli
@@ -115,6 +134,28 @@ try {
     }
 
     if (Test-Path $ziel) { Remove-Item $ziel -Force }
+
+    # Erst ein Dreizeiler: Scheitert schon der, liegt es am Compiler und nicht
+    # am Quelltext von CodeBox. Das spart die Suche an der falschen Stelle.
+    $probe = Join-Path $env:TEMP "codebox-probe.cpp"
+    $probeZiel = Join-Path $env:TEMP "codebox-probe.exe"
+    Set-Content -Path $probe -Value "int main() { return 0; }" -Encoding ASCII
+    & $gpp $probe "-o" $probeZiel *> $protokoll
+    if ($LASTEXITCODE -ne 0) {
+        Fehler "Schon ein dreizeiliges Testprogramm laesst sich nicht uebersetzen."
+        Fehler "Die MSYS2-Installation ist unvollstaendig, nicht dein Quelltext."
+        $text = if (Test-Path $protokoll) { Get-Content $protokoll -Raw } else { "" }
+        if ($text -and $text.Trim() -ne "") { Write-Host $text }
+        Write-Host ""
+        Info "Reparieren -- im Fenster 'MSYS2 UCRT64' aus dem Startmenue:"
+        Info "  pacman -S --needed mingw-w64-ucrt-x86_64-toolchain"
+        Info "Und dort auch gleich uebersetzen:"
+        Info "  cd /c/Users/ikwyg/Documents/Developer/CodeBox/codebox-cli"
+        Info "  g++ -std=c++17 -static src/main.cpp -o codebox.exe"
+        exit 1
+    }
+    Remove-Item $probeZiel -Force -ErrorAction SilentlyContinue
+    Gut "Testprogramm uebersetzt -- der Compiler arbeitet."
 
     $fertig = Bauen @("-std=c++17", "-Wall", "-Wextra", "-O2", "-static",
                       "src/main.cpp", "-o", "codebox.exe") "statisch gebunden"

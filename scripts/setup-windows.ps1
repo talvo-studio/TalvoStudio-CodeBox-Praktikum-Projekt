@@ -234,6 +234,14 @@ if ($OhneWerkzeug) {
     }
 
     if ($gpp) {
+        # cc1plus.exe -- das Programm, das g++ fuer die eigentliche Arbeit
+        # aufruft -- findet seine DLLs nur, wenn der bin-Ordner des Compilers
+        # im PATH steht. Fehlt er, bricht das Uebersetzen ohne jede Meldung ab.
+        $gppOrdner = Split-Path $gpp -Parent
+        if ($gppOrdner -and ($env:Path -split ";") -notcontains $gppOrdner) {
+            $env:Path = $gppOrdner + ";" + $env:Path
+        }
+
         Push-Location $cli
         try {
             # -static bindet die Laufzeitbibliotheken mit ein. Ohne das sucht
