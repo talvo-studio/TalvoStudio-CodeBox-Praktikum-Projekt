@@ -100,9 +100,29 @@ export PATH="$HOME/.local/bin:$PATH"
 
 **Windows**
 
-Die `codebox.exe` nach `C:\msys64\ucrt64\bin\` kopieren. Soll sie auch
-außerhalb von MSYS2 laufen, gehört ihr Ordner in die Umgebungsvariable Path —
-über „Umgebungsvariablen für dieses Konto bearbeiten" in den Einstellungen.
+```powershell
+powershell -ExecutionPolicy Bypass -File ..\scripts\install-windows.ps1
+```
+
+Das trägt den Ordner mit der `codebox.exe` in den Path deines Kontos ein —
+nicht in den des Systems, dafür braucht es keine Administratorrechte. Danach
+reicht in einem **neuen** Fenster `codebox`, ohne `.\` und ohne `.exe`.
+
+Eingetragen wird der Projektordner selbst statt einer Kopie: So wirkt jedes
+erneute Übersetzen sofort. Rückgängig mit `-Entfernen`.
+
+Von Hand geht es auch — aber **nicht mit `setx`**: Das schneidet einen Path,
+der länger als 1024 Zeichen ist, kommentarlos ab, und danach sucht man
+tagelang nach Programmen, die „plötzlich weg" sind. Stattdessen:
+
+```powershell
+$ordner = "C:\Users\...\CodeBox\codebox-cli"
+$alt = [Environment]::GetEnvironmentVariable("Path", "User")
+[Environment]::SetEnvironmentVariable("Path", "$alt;$ordner", "User")
+```
+
+Oder über die Oberfläche: „Umgebungsvariablen für dieses Konto bearbeiten" in
+den Windows-Einstellungen.
 
 Danach in einem **neuen** Fenster prüfen: `codebox --help`
 

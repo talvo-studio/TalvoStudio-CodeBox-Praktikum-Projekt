@@ -67,6 +67,12 @@ npm run dev
 
 Das Werkzeug braucht ein **zweites** Fenster, während das erste läuft.
 
+Damit dort `codebox` statt `.\codebox.exe` reicht, einmalig:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Users\ikwyg\Documents\Developer\CodeBox\scripts\install-windows.ps1
+```
+
 ## Auf macOS oder Linux starten
 
 ```bash
