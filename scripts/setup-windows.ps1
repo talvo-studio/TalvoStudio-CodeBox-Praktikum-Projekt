@@ -236,8 +236,21 @@ if ($OhneWerkzeug) {
     if ($gpp) {
         Push-Location $cli
         try {
-            & $gpp -std=c++17 -Wall -Wextra -O2 "src/main.cpp" -o "codebox.exe"
-            if ($LASTEXITCODE -eq 0 -and (Test-Path (Join-Path $cli "codebox.exe"))) {
+            # -static bindet die Laufzeitbibliotheken mit ein. Ohne das sucht
+            # codebox.exe beim Start libstdc++-6.dll und libgcc_s_seh-1.dll und
+            # laeuft nur im MSYS2-Fenster, nicht in PowerShell.
+            & $gpp -std=c++17 -Wall -Wextra -O2 -static "src/main.cpp" -o "codebox.exe"
+
+            if ($LASTEXITCODE -ne 0) {
+                Warnung "Statisches Binden ging nicht, versuche es ohne."
+                & $gpp -std=c++17 -Wall -Wextra -O2 "src/main.cpp" -o "codebox.exe"
+                if ($LASTEXITCODE -eq 0) {
+                    Warnung "codebox.exe braucht jetzt die DLLs aus C:\msys64\ucrt64\bin."
+                    Warnung "Falls sie beim Start fehlen: diesen Ordner in den Path aufnehmen."
+                }
+            }
+
+            if (Test-Path (Join-Path $cli "codebox.exe")) {
                 $werkzeug = Join-Path $cli "codebox.exe"
                 Gut "codebox.exe uebersetzt: $werkzeug"
             } else {

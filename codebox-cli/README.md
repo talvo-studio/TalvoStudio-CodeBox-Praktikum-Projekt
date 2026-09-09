@@ -37,7 +37,21 @@ Oder kürzer, wenn `make` da ist:
 make
 ```
 
-Unter Windows heißt die entstandene Datei `codebox.exe`.
+**Unter Windows** heißt die entstandene Datei `codebox.exe` — und sie will
+statisch gebunden sein:
+
+```
+g++ -std=c++17 -Wall -Wextra -O2 -static src/main.cpp -o codebox.exe
+```
+
+Oder `make windows`.
+
+Der Grund für `-static`: Ohne den Schalter sucht das fertige Programm beim
+Start `libstdc++-6.dll` und `libgcc_s_seh-1.dll`. Die liegen in
+`C:\msys64\ucrt64\bin` und werden nur gefunden, wenn man aus dem
+MSYS2-Fenster startet. In PowerShell käme sonst eine Meldung über eine
+fehlende DLL. Mit `-static` steckt alles in der einen Datei — die lässt sich
+dann auch weitergeben, ohne dass beim anderen etwas installiert sein muss.
 
 **Compiler, falls noch keiner da ist**
 
@@ -129,7 +143,13 @@ Nutzer desselben Rechners sichtbar.
 
 **„codebox" wird nicht gefunden**
 Das Programm liegt noch nicht im PATH — siehe oben. Aus dem Projektordner
-heraus geht es immer mit `./codebox` (Windows: `.\codebox.exe`).
+heraus geht es immer mit `./codebox` (Windows: `.\codebox.exe`). In
+PowerShell ist der Punkt am Anfang Pflicht: Ohne ihn sucht PowerShell nur im
+PATH und nicht im aktuellen Ordner.
+
+**„libstdc++-6.dll wurde nicht gefunden" (Windows)**
+Das Programm wurde ohne `-static` übersetzt. Noch einmal mit dem Schalter
+übersetzen — siehe oben.
 
 **„Nicht angemeldet"**
 `codebox login` ausführen.

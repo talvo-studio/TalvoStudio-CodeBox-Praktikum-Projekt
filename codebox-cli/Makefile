@@ -8,7 +8,12 @@ ZIEL     ?= codebox
 $(ZIEL): src/main.cpp
 	$(CXX) $(CXXFLAGS) src/main.cpp -o $(ZIEL)
 
-.PHONY: sauber installieren
+# Unter Windows statisch binden: sonst sucht codebox.exe beim Start die DLLs
+# aus C:\msys64\ucrt64\bin und laeuft nur im MSYS2-Fenster.
+windows:
+	$(CXX) $(CXXFLAGS) -static src/main.cpp -o codebox.exe
+
+.PHONY: sauber installieren windows
 sauber:
 	rm -f $(ZIEL) $(ZIEL).exe
 
