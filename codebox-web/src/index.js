@@ -320,6 +320,16 @@ input[type=text], input[type=password], input:not([type]) {
   border: 1px solid #ccc; border-radius: 4px; background: #fff;
 }
 input[type=file] { margin-top: 0.5rem; font: inherit; max-width: 100%; }
+/* Formulare aus einem Feld und einem Knopf gehören in eine Zeile. Auf
+   schmalen Bildschirmen rutscht der Knopf von selbst darunter. */
+form.reihe { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin: 1rem 0; }
+form.reihe input { width: auto; flex: 1 1 13rem; }
+form.reihe button, form.reihe .knopf { margin-top: 0; flex: 0 0 auto; }
+form.reihe .weiter { font-size: 0.9rem; }
+/* Die Knöpfe einer Dateiseite stehen nebeneinander, nicht untereinander. */
+.aktionen { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin: 1.5rem 0; }
+.aktionen form { margin: 0; }
+.aktionen button, .aktionen .knopf { margin-top: 0; }
 button, .knopf {
   display: inline-block; margin-top: 1rem; padding: 0.6rem 1.2rem; font: inherit;
   background: #1a1a1a; color: #fff; border: 0; border-radius: 4px;
@@ -658,7 +668,7 @@ async function behandle(request, env) {
         "weitergeben. Wer den Code hat, kommt an die Datei — ohne Konto, ohne " +
         "Anmeldung.</p>" +
         "<h2>Code einlösen</h2>" +
-        '<form method="get" action="/oeffnen">' +
+        '<form class="reihe" method="get" action="/oeffnen">' +
         '<input class="code-eingabe" name="code" placeholder="ABC123" required ' +
         'maxlength="6" aria-label="Code">' +
         "<button>Öffnen</button></form>" +
@@ -785,11 +795,11 @@ async function behandle(request, env) {
     const { results } = await abfrage.all();
 
     const suchfeld =
-      '<form method="get" action="/box">' +
+      '<form class="reihe" method="get" action="/box">' +
       '<input name="q" value="' + escapeHtml(suche) + '" placeholder="Dateiname suchen" ' +
       'aria-label="Suchen">' +
       "<button>Suchen</button>" +
-      (suche ? ' <a href="/box">Alle zeigen</a>' : "") +
+      (suche ? '<a class="weiter" href="/box">Alle zeigen</a>' : "") +
       "</form>";
 
     const liste =
@@ -818,7 +828,7 @@ async function behandle(request, env) {
         suchfeld +
         liste +
         "<h2>Datei hochladen</h2>" +
-        '<form method="post" action="/upload" enctype="multipart/form-data">' +
+        '<form class="reihe" method="post" action="/upload" enctype="multipart/form-data">' +
         '<input type="file" name="datei" required>' +
         "<button>Hochladen</button></form>" +
         '<p class="hinweis">Quelltext bis ' + groesse(MAX_BYTES) + ", höchstens " +
@@ -912,6 +922,10 @@ async function behandle(request, env) {
         '<form method="post" action="/nicht-mehr-teilen">' +
         '<input type="hidden" name="id" value="' + escapeHtml(datei.id) + '">' +
         "<button>Nicht mehr teilen</button></form></div>"
+      : "";
+
+    const teilenKnopf = datei.share_code
+      ? ""
       : '<form method="post" action="/teilen">' +
         '<input type="hidden" name="id" value="' + escapeHtml(datei.id) + '">' +
         "<button>Teilen</button></form>";
@@ -922,12 +936,15 @@ async function behandle(request, env) {
         '<p class="hinweis">' + groesse(datei.size) + " · " + datum(datei.created_at) + "</p>" +
         "<pre><code>" + escapeHtml(datei.content) + "</code></pre>" +
         teilBereich +
-        '<p><a class="knopf" href="/f/' + encodeURIComponent(datei.id) +
-        '/raw">Herunterladen</a></p>' +
+        '<div class="aktionen">' +
+        teilenKnopf +
+        '<a class="knopf" href="/f/' + encodeURIComponent(datei.id) +
+        '/raw">Herunterladen</a>' +
         '<form method="post" action="/loeschen" ' +
         "onsubmit=\"return confirm('Wirklich löschen? Das lässt sich nicht rückgängig machen.')\">" +
         '<input type="hidden" name="id" value="' + escapeHtml(datei.id) + '">' +
         '<button class="gefahr">Löschen</button></form>' +
+        "</div>" +
         '<p><a href="/box">Zurück zur CodeBox</a></p>',
       nutzer,
     );
