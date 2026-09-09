@@ -49,6 +49,24 @@ startet die Website auf `http://localhost:8787`.
 Anderer Ort: `-Verzeichnis D:\Projekte\CodeBox`. Ohne das Werkzeug:
 `-OhneWerkzeug`. Nur einrichten, nicht starten: `-KeinStart`.
 
+## Jeden Tag danach: starten
+
+Die Website läuft nur, solange ihr Fenster offen ist. Zum Starten:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Users\ikwyg\Documents\Developer\CodeBox\scripts\start-windows.ps1
+```
+
+Oder von Hand — wichtig ist der Ordner `codebox-web`, dort liegt die
+`package.json`:
+
+```powershell
+cd C:\Users\ikwyg\Documents\Developer\CodeBox\codebox-web
+npm run dev
+```
+
+Das Werkzeug braucht ein **zweites** Fenster, während das erste läuft.
+
 ## Auf macOS oder Linux starten
 
 ```bash
